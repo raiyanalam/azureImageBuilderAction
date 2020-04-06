@@ -20,11 +20,14 @@ jobs:
     - run: |
         ls -ltr
         pwd
+  downloadUploadedArtifact:
+    name: downloadUploadedArtifact
+    runs-on: ubuntu-latest
+    steps:
     - name: Download artifact
       uses: actions/download-artifact@v1.0.0
       with:        
-        name: repo-readme 
-        #path: 
+        name: repo-readme         
     - run: |
         ls -ltr
         pwd
