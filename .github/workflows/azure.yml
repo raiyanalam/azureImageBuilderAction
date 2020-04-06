@@ -17,8 +17,14 @@ jobs:
       with:        
         name: repo-readme
         path: ./README.md
+    - run: |
+        ls -ltr
+        pwd
     - name: Download artifact
       uses: actions/download-artifact@v1.0.0
       with:        
         name: repo-readme 
         #path: 
+    - run: |
+        ls -ltr
+        pwd
