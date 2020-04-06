@@ -1,5 +1,3 @@
-#github action for azure image builder
-
 on: push
 jobs:
   build-and-deploy:
@@ -15,12 +13,12 @@ jobs:
         imagebuilderTemplate: ubuntu1804
         buildTimeoutInMinutes: 80
         vmType: Standard_D1_v2
-        shell: |        
-          uri=https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/customizeScript.sh
-          uri=https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/customizeScript2.sh
-        file: |
-          uri=https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/exampleArtifacts/buildArtifacts/index.html
-          destination=/tmp/index.html
+#        shell: |        
+#          uri=https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/customizeScript.sh
+#          uri=https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/customizeScript2.sh
+#        file: |
+#          uri=https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/exampleArtifacts/buildArtifacts/index.html
+#          destination=/tmp/index.html
         shell-inline: |
           sudo mkdir /buildArtifacts
           sudo cp /tmp/index.html /buildArtifacts/index.html
