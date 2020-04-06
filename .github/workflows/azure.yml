@@ -1,33 +1,31 @@
+# https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
 
-on:
-  push
+name: Share data between jobs
 
+on: [push]
 
 jobs:
-  checkoutAndUpload:
-    name: checkoutAndUpload
+  job_1:
+    name: Add 3 and 7
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - run: |
-        ls -ltr
-        pwd
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:        
-        name: repo-readme
-        path: ./README.md
-    - run: |
-        ls -ltr
-        pwd
-  downloadUploadedArtifact:
-    name: downloadUploadedArtifact
-    runs-on: ubuntu-latest
+      - shell: bash
+        run: |
+          expr 3 + 7 > math-homework.txt
+      - name: Upload math result for job 1
+        uses: actions/upload-artifact@v1
+        with:
+          name: homework
+          path: math-homework.txt
+
+  job_2:
+    name: Multiply by 9
+    needs: job_1
+    runs-on: windows-latest
     steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v1.0.0
-      with:        
-        name: repo-readme         
-    - run: |
-        ls -ltr
-        pwd
+      - name: Download math result for job 1
+        uses: actions/download-artifact@v1
+        with:
+          name: homework
+      - run: |
+          ls -ltr
