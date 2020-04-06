@@ -4,8 +4,8 @@ on:
 
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy
+  checkoutAndUpload:
+    name: checkoutAndUpload
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -17,3 +17,8 @@ jobs:
       with:        
         name: repo-readme
         path: ./README.md
+    - name: Download artifact
+      uses: actions/download-artifact@v1.0.0
+      with:        
+        name: repo-readme 
+        #path: 
