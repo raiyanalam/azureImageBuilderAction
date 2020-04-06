@@ -1,13 +1,4 @@
-# This workflow will build and push a node.js application to an Azure Web App when a release is created.
-#
-# To configure this workflow:
-#
-# 1. Set up a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE with the value of your Azure publish profile.
-#
-# 2. Change the values for the AZURE_WEBAPP_NAME, AZURE_WEBAPP_PACKAGE_PATH and NODE_VERSION environment variables  (below).
-#
-# For more information on GitHub Actions for Azure, refer to https://github.com/Azure/Actions
-# For more samples to get started with GitHub Action workflows to deploy to Azure, refer to https://github.com/Azure/actions-workflow-samples
+
 on:
   push
 
@@ -21,8 +12,8 @@ jobs:
     - run: |
         ls -ltr
         pwd
-#    - name: Upload artifact
-#      uses: actions/upload-artifact@v1.0.0
-#      with:        
-#        name:    
-#        path: 
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:        
+        name: repo-readme
+        path: ./README.md
