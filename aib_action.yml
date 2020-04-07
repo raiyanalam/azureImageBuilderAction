@@ -6,7 +6,15 @@ jobs:
     # checkout the repo
     - name: 'Checkout Github Action' 
       uses: actions/checkout@master
-     
+    
+    - name: azure authentication
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - run: |
+        az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc \
+          --role Contributor --scope /subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup
+    
     - name: 'Run Azure image builder'
       uses: azure/imageBuildery@v0
       with: 
@@ -29,4 +37,4 @@ jobs:
         distribution-artifactTags: |
           source=azVmImageBuilder
           baseosimg=ubuntu1804
-
+    
