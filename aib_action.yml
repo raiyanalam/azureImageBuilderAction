@@ -23,9 +23,9 @@ jobs:
           sudo mkdir /buildArtifacts
           sudo cp /tmp/index.html /buildArtifacts/index.html
         distribution-type: ManagedImage
-        distribution-imageid: /subscriptions/a87c004e-36b1-4eef-b8f3-ec8a539d10ea/resourceGroups/ibLinuxGalleryRG/providers/Microsoft.Compute/images/myBuilderImage
+        distribution-imageid: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<ImageName>
         distribution-location: WestUS2
-        distribution-runOutputName: aibLinux
+        distribution-runOutputName: linux.$releaseID
         distribution-artifactTags: |
           source=azVmImageBuilder
           baseosimg=ubuntu1804
