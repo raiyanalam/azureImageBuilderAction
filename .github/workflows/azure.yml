@@ -30,3 +30,40 @@ jobs:
           name: homework
       - run: |
           ls -ltr
+  job_3: 
+    name: Azure Image builder run 
+    runs-on: ubuntu-latest
+    env:
+      subscriptionID: "xxxx-xxxxx"
+      ######Source image details########### 
+      type: "PlatformImage"
+      publisher: "Canonical"
+      offer": "UbuntuServer"
+      sku: "18.04-LTS"
+      version: "latest"    
+     ######Target Distribution details###########
+      distributorResourceGroup: "iblinuxGalleryRG"
+      imageGalleryName: "iblinuxGallery"
+      imageDefinition: "iblinux"
+      imageVersion: "0.1"
+      imageLocation: "West US2"
+    ########Custom Scipt location#######
+      customizer[0].type: "Shell"
+      customizer[0].name: "RunScriptFromSource"
+      customizer[0].scriptUri: "https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/customizeScript.sh"
+    
+    steps:     
+        - name: azure authentication
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+             
+        - name: azure Image builder create template
+          uses: azure/cli@v1
+        - run: |
+            az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc \
+              --role Contributor --scope /subscriptions/<subscriptionID>/resourceGroups/<distributorResourceGroup>
+              
+            
+                   
+    
