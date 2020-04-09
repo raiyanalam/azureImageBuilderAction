@@ -58,11 +58,14 @@ jobs:
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
              
-        - name: azure Image builder create template
+        - name: azure Image builder 
           uses: azure/cli@v1
         - run: |
             az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc \
               --role Contributor --scope /subscriptions/<subscriptionID>/resourceGroups/<distributorResourceGroup>
+                
+        - name: azure Image builder
+          uses: azure/imagebuilder@v0
               
             
                    
