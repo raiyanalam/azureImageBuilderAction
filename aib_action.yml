@@ -6,35 +6,26 @@ jobs:
     # checkout the repo
     - name: 'Checkout Github Action' 
       uses: actions/checkout@master
-    
-    - name: azure authentication
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - run: |
-        az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc \
-          --role Contributor --scope /subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup
-    
     - name: 'Run Azure image builder'
       uses: azure/imageBuildery@v0
       with: 
-        imagebuilderTemplate: ubuntu1804
-        buildTimeoutInMinutes: 80
-        vmType: Standard_D1_v2
-#        shell: |        
-#          uri=https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/customizeScript.sh
-#          uri=https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/customizeScript2.sh
-#        file: |
-#          uri=https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/exampleArtifacts/buildArtifacts/index.html
-#          destination=/tmp/index.html
-        shell-inline: |
-          sudo mkdir /buildArtifacts
-          sudo cp /tmp/index.html /buildArtifacts/index.html
+        subscriptionID: "xxxxxx"
+        ResourceGroupName: "distributorRG"
+        imageType: PlatfromImage
+        imagebuilderTemplateName: ubuntu1804  ### Standard templates will be part of this action repo
+        buildTimeoutInMinutes: 80      
+        customizer[0].type: shell     
+        customizer[0].name: "runCustomScript"
+        customizer[0].source: "https://raw.githubusercontent.com/lnochili/learn-git/master/aib-shellscript.sh"
+        customizer[0].destination: "/tmp/aib-hostnameScript.sh"
+        customizer[1].type: shell-inline     
+        customizer[1].name: "setupBuildPath"
+        customizer[1].source: |
+            sudo mkdir /buildArtifacts
+            sudo cp /tmp/index.html /buildArtifacts/index.html
         distribution-type: ManagedImage
-        distribution-imageid: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<ImageName>
+        distribution-imagedef: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>
         distribution-location: WestUS2
-        distribution-runOutputName: linux.$releaseID
-        distribution-artifactTags: |
-          source=azVmImageBuilder
-          baseosimg=ubuntu1804
+        distribution-runOutputName: imageDefName.$BuildID  #### this ID needs to be Unique
+        distribution-artifactTags: "UbuntuServer 18.04LTS"
     
