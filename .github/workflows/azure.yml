@@ -10,8 +10,8 @@ jobs:
     name: Azure Image builder run 
     runs-on: ubuntu-latest
     env:
-      image-template-name: "UbuntuServer18.04LTS"
-      run-output-name: ${{job.job_id}}
+      image_template_name: "UbuntuServer18.04LTS"
+      run_output_name: ${{job.job_id}}
       ######Source image details########### 
       type: "PlatformImage"
       publisher: "Canonical"
@@ -19,15 +19,12 @@ jobs:
       sku: "18.04-LTS"
       version: "latest"    
      ######Target Distribution details###########
-      distributor-resource-group: "iblinuxGalleryRG"
-      image-gallery-name: "iblinuxGallery"
-      image-definition: "iblinux"
-      image-version: "0.1"
-      image-location: "West US2"
+      distributor_resource_group: "iblinuxGalleryRG"
+      image_gallery_name: "iblinuxGallery"
+      image_definition: "iblinux"
+      image_version: "0.1"
+      image_location: "West US2"
     ########Custom Scipt location#######
-      customizer[0].type: "Shell"
-      customizer[0].name: "RunScriptFromSource"
-      customizer[0].scriptUri: "https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/customizeScript.sh"
     
     steps:  
         - name: 'Checkout Github Action' 
@@ -41,33 +38,47 @@ jobs:
         - name: azure Image builder prerequisites 
           uses: azure/cli@v1
           with:
-            resource-group: ${{env.distributor-resource-group}}
-            image-gallery-name: ${{env.image-gallery-name}}
-            image-definition: ${{env.image-definition}}
-            image-version: ${{env.image-version}}
-            image-location: ${{env.image-location}}
-            inlineScript: |
-              chmod +x $GITHUB_WORKSPACE/.github/workflows/azcli-script-prereqs.sh
+            ######Source image details########### 
+              type: "PlatformImage"
+              publisher: "Canonical"
+              offer": "UbuntuServer"
+              sku: "18.04-LTS"
+              version: "latest"    
+              os_type: "Linux"
+              inlineScript: |
+                az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc --role Contributor \
+                    --scope /subscriptions/{{secrets.AZURE_CREDS.subscriptionID}}/resourceGroups/${{env.distributorResourceGroup}}
+                az group create -n ${{env.distributor_resource_group}} -l ${{env.image_location}}
+                az sig create -g ${distributor_resource_group}  --gallery-name ${image_gallery_name}
+                az sig image-definition create -g ${{env.distributor_resource_group}} --gallery-name ${{env.image_gallery_name}} \
+                  --gallery-image-definition ${{env.image_definiation}} --publisher ${{publisher}} --offer ${{offer}}  \
+                      --sku ${{sku}}  --os-type ${{os_type}}
                          
-        - name: 'Update AIB template with inputs'
+        - name: 'Update AIB standard template with inputs'
+          customizer.type: "Shell"
+          customizer.name: "RunScriptFromSource"
+          customizer.scriptUri: "https://raw.githubusercontent.com/raiyanalam/azureImageBuilderAction/master/PlatformImageTemplate-UbuntuLinuxCanonical.json
           run: |
-            curl https://raw.githubusercontent.com/raiyanalam/azureImageBuilderAction/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o PlatformImageTemplate-UbuntuLinuxCanonical.json
-            sed -i -e "s/<subscriptionID>/${{secrets.subscriptionID}/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
-            sed -i -e "s/<rgName>/${{env.distributor-resource-group}}/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
-            sed -i -e "s/<region>/${{env.image-location}}/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
-            sed -i -e "s/<imageName>/${{env.image-definition}}/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
-            sed -i -e "s/<runOutputName>/${{env.run-output-name}}/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
+            mkdir $GITHUB_WORKSPACE/aib-local
+            curl https://raw.githubusercontent.com/raiyanalam/azureImageBuilderAction/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./aiblocal/PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<subscriptionID>/${{secrets.AZURE_CREDS.subscriptionID}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<rgName>/${{env.distributor_resource_group}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<region>/${{env.image_location}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<imageName>/${{env.image_definition}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<runOutputName>/${{env.run_output_name}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
+            
                       
         - name: azure Image builder run
-#         uses: azure/cli@v1
-          with:
-            resource-group: ${{env.distributor-resource-group}}
-            image-gallery-name: ${{env.image-gallery-name}}
-            image-definition: ${{env.image-definition}}
-            aib-template-name: ${{env.aib-template-name}}
-            run-output-nme: ${{env.run-output-name}} 
-                              
-            inlineScript: |
-              chmod +x $GITHUB_WORKSPACE/.github/workflows/azcli-imagebuilder-script.sh
+          uses: azure/cli@v1
+          with:                          
+           inlineScript: |
+              ###Create Image Template Resource###
+                az resource create  --resource-group ${{env.distributor-resource-group}}  \ 
+                    --properties @$GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json \
+                      --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image-templage-name}}
+
+              #### Run Image Template Resource ###
+                az resource invoke-action  --resource-group ${{env.distributor-resource-group}}  \
+                      --resource-type  Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image-template-name}} --action Run
                    
     
