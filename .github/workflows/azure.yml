@@ -1,5 +1,5 @@
 # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
-# test run
+# Azure Image Builder work flow using Azure CLI
 
 name: Share data between jobs
 
@@ -33,11 +33,12 @@ jobs:
         - name: azure authentication
           uses: azure/login@v1
           with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
+            creds: ${{ secrets.AZURE_CREDS }}
              
         - name: azure Image builder prerequisites 
           uses: azure/cli@v1
           with:
+              creds: ${{secrets.AZURE_CREDS}}  
             ######Source image details########### 
               type: "PlatformImage"
               publisher: "Canonical"
@@ -55,9 +56,6 @@ jobs:
                       --sku ${{sku}}  --os-type ${{os_type}}
                          
         - name: 'Update AIB standard template with inputs'
-          customizer.type: "Shell"
-          customizer.name: "RunScriptFromSource"
-          customizer.scriptUri: "https://raw.githubusercontent.com/raiyanalam/azureImageBuilderAction/master/PlatformImageTemplate-UbuntuLinuxCanonical.json
           run: |
             mkdir $GITHUB_WORKSPACE/aib-local
             curl https://raw.githubusercontent.com/raiyanalam/azureImageBuilderAction/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./aiblocal/PlatformImageTemplate-UbuntuLinuxCanonical.json
@@ -67,18 +65,40 @@ jobs:
             sed -i -e "s/<imageName>/${{env.image_definition}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<runOutputName>/${{env.run_output_name}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
             
-                      
-        - name: azure Image builder run
+        #### Azure Image builder actions ####              
+        - name: Create azure Image builder template   
           uses: azure/cli@v1
-          with:                          
-           inlineScript: |
+          with:
+            creds: ${{secrets.AZURE_CREDS}}                          
+            inlineScript: |
               ###Create Image Template Resource###
-                az resource create  --resource-group ${{env.distributor-resource-group}}  \ 
+                az resource create  --resource-group ${{env.distributor_resource_group}}  \ 
                     --properties @$GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json \
-                      --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image-templage-name}}
+                      --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image_template_name}}
 
+        - name: Add Customizers to azure Image builder template
+          uses: azure/cli@v1
+          with:
+            creds: ${{secrets.AZURE_CREDS}}   
+            customizer.type: "shell"
+            customizer.name: "RunScriptFromSource"
+            customizer.scriptUri: "https://raw.githubusercontent.com/raiyanalam/azureImageBuilderAction/master/PlatformImageTemplate-UbuntuLinuxCanonical.json"
+            inlineScript: |
+              ###Update Image template with customizers###
+              az image builder  customizer add --resource-group ${{env.distributor_resource_group}} -n ${{env.image_template_name}} \ 
+                    --scripts $customizer.scriptUri  --customizer-name $customizer.name --type $customiser.type 
+                    
+              az image builder  customizer add --resource-group ${{env.distributor_resource_group}} -n ${{env.image_template_name}} \ 
+                    --inline-script "sudo mkdir /buildArtifacts" \"sudo cp /tmp/index.html /buildArtifacts/index.html" \
+                      --customizer-name shell-script-inline  
+
+        - name: Run azure Image builder template
+          uses: azure/cli@v1
+          with:   
+            creds: ${{secrets.AZURE_CREDS}}                       
+            inlineScript: |
               #### Run Image Template Resource ###
-                az resource invoke-action  --resource-group ${{env.distributor-resource-group}}  \
-                      --resource-type  Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image-template-name}} --action Run
-                   
+                az resource invoke-action  --resource-group ${{env.distributor_resource_group}}  \
+                      --resource-type  Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image_template_name}} --action Run
+               
     
