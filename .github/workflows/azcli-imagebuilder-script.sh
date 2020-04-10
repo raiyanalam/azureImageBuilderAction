@@ -1,7 +1,7 @@
 ####Create Image Template Resource###
-az resource create  --resource-group ${{distributor-resource-group}}  --properties  @${{imagebuilder-template.json}} \
-    --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{image-templage-name}}
+az resource create  --resource-group ${{resource-group}}  --properties  @${{aib-template-file}} \
+    --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{aib-templage-name}}
 
 #### Run Image Template Resource ###
-az resource invoke-action  --resource-group ${{distributor-resource-group}} --resource-type  Microsoft.VirtualMachineImages/imageTemplates \
-      -n ${{image-templage-name}} --action Run
+az resource invoke-action  --resource-group ${{resource-group}} --resource-type  Microsoft.VirtualMachineImages/imageTemplates \
+      -n ${{image-template-name}} --action Run
