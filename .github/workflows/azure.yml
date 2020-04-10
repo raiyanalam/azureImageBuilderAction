@@ -6,31 +6,7 @@ name: Share data between jobs
 on: [push]
 
 jobs:
-  job_1:
-    name: Add 3 and 7
-    runs-on: ubuntu-latest
-    steps:
-      - shell: bash
-        run: |
-          expr 3 + 7 > math-homework.txt
-      - name: Upload math result for job 1
-        uses: actions/upload-artifact@v1
-        with:
-          name: homework
-          path: math-homework.txt
-
-  job_2:
-    name: Multiply by 9
-    needs: job_1
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download math result for job 1
-        uses: actions/download-artifact@v1
-        with:
-          name: homework
-      - run: |
-          ls -ltr
-  job_3: 
+  job_1: 
     name: Azure Image builder run 
     runs-on: ubuntu-latest
     env:
@@ -42,17 +18,20 @@ jobs:
       sku: "18.04-LTS"
       version: "latest"    
      ######Target Distribution details###########
-      distributorResourceGroup: "iblinuxGalleryRG"
-      imageGalleryName: "iblinuxGallery"
-      imageDefinition: "iblinux"
-      imageVersion: "0.1"
-      imageLocation: "West US2"
+      distributor-resource-group: "iblinuxGalleryRG"
+      image-gallery-name: "iblinuxGallery"
+      image-definition: "iblinux"
+      image-version: "0.1"
+      image-location: "West US2"
     ########Custom Scipt location#######
       customizer[0].type: "Shell"
       customizer[0].name: "RunScriptFromSource"
       customizer[0].scriptUri: "https://raw.githubusercontent.com/danielsollondon/azvmimagebuilder/master/quickquickstarts/customizeScript.sh"
     
-    steps:     
+    steps:  
+        - name: 'Checkout Github Action' 
+          uses: actions/checkout@master
+
         - name: azure authentication
           uses: azure/login@v1
           with:
@@ -63,10 +42,24 @@ jobs:
         - run: |
             az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc \
               --role Contributor --scope /subscriptions/<subscriptionID>/resourceGroups/<distributorResourceGroup>
-                
+            if {az group create -n ${distributor-resource-group} -l ${image-location} } 
+            az sig create -g ${distributor-resource-group}  --gallery-name ${image-gallery-name}
+            az sig image-definition create -g ${distributor-resource-group} --gallery-name ${image-gallery-name} \
+              --gallery-image-definition ${image-definiation} --publisher ${publisher} --offer ${offer}  --sku ${sku}  --os-type "linux"
+         
+        - name: 'Update AIB template with inputs'
+          run: |
+            curl https://raw.githubusercontent.com/raiyanalam/azureImageBuilderAction/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<subscriptionID>/${subscriptionID}/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<rgName>/${distributor-resource-group}/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<region>/${image-location}/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<imageName>/${image-definition}/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<runOutputName>/$run-output-name/g" PlatformImageTemplate-UbuntuLinuxCanonical.json
+                      
         - name: azure Image builder
-          uses: azure/imagebuilder@v0
-              
+#         uses: azure/imagebuilder@v0
+          run: |
+                              
             
                    
     
