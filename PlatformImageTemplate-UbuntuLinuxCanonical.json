@@ -22,45 +22,7 @@
                 "offer": "UbuntuServer",
                 "sku": "18.04-LTS",
                 "version": "latest"          
-        },
-        "customize": [
-            {
-                "type": "Shell",
-                "name": "RunScriptFromSource",
-                "scriptUri": ""
-            },
-
-            {
-                "type": "Shell",
-                "name": "CheckSumCompareShellScript",
-                "scriptUri": "",
-                "sha256Checksum": ""
-            },
-            
-            {
-                "type": "File",
-                "name": "downloadBuildArtifacts",
-                "sourceUri": "**/Artifacts/buildArtifacts/*",
-                "destination":"/tmp/*"
-            },
-
-            {
-                "type": "Shell",
-                "name": "setupBuildPath",
-                "inline": [
-                    "sudo mkdir /buildArtifacts",
-                    "sudo cp /tmp/* /buildArtifacts/*"
-                ]
-            },
-
-            {
-                "type": "Shell",
-                "name": "InstallUpgrades",
-                "inline": [
-                    "sudo apt install unattended-upgrades"
-                ]
             }
-
         ],
         "distribute": 
             [
