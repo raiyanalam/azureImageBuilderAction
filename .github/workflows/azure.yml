@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       image_template_name: "UbuntuServer18.04LTS"
-      run_output_name: ${{job.job_id}}
+      run_output_name: ${{jobs.job_1.env.version}}
       ######Source image details########### 
       type: "PlatformImage"
       publisher: "Canonical"
