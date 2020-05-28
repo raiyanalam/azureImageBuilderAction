@@ -19,5 +19,19 @@ jobs:
       with:
         azcliversion: 2.0.72
         inlineScript: |
-          az account show
-          az storage -h
+          az account show          
+          imgDef="/subscriptions/afc11291-9826-46be-b852-70349146ddf8/resourceGroups/raiyan-rg2/providers/Microsoft.Compute/galleries/rai_sig/images/zenithworks-core"
+          vmResourceGroup=raiyan-rg2
+          location=eastus
+          vmName=rai-vm-frm-sig
+          adminUsername=moala
+          adminPassword=${{ secrets.vm_pwd }}
+
+          az group create --name $vmResourceGroup --location $location
+
+          az vm create\
+            --resource-group $vmResourceGroup \
+            --name $vmName \
+            --image $imgDef \
+            --admin-username $adminUsername \
+            --admin-password $adminPassword
