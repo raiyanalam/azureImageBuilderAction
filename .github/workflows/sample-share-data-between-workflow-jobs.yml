@@ -3,7 +3,14 @@
 
 name: Share data between jobs
 
-on: [push]
+on:
+  push:
+    branches:
+      - master    
+    # file paths to consider in the event. Optional; defaults to all.
+    paths:
+      - '.github/workflows/sample-share-data-between-workflow-jobs'
+
 
 jobs:
   job_1: 

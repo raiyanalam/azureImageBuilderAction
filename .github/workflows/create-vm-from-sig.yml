@@ -27,7 +27,7 @@ jobs:
           adminUsername=moala
           adminPassword=${{ secrets.vm_pwd }}
 
-          az group create --name $vmResourceGroup --location $location
+#          az group create --name $vmResourceGroup --location $location
 
           az vm create\
             --resource-group $vmResourceGroup \
