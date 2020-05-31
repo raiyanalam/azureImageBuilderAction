@@ -21,7 +21,7 @@ jobs:
         azcliversion: 2.0.72
         inlineScript: |
           az account show          
-          imgDef="/subscriptions/afc11291-9826-46be-b852-70349146ddf8/resourceGroups/raiyan-rg2/providers/Microsoft.Compute/galleries/rai_sig_eastus/images/rai_ubunut_packer_def/versions/0.0.1"
+          imgDef="/subscriptions/afc11291-9826-46be-b852-70349146ddf8/resourceGroups/raiyan-rg2/providers/Microsoft.Compute/galleries/rai_sig_eastus/images/rai_ubunut_packer_def"
           
           vmResourceGroup=raiyan-rg2
           location=eastus
