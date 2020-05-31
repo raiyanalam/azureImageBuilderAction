@@ -1,5 +1,6 @@
 # A sample workflow to create VM from shared image gallery!!
 # az group create --name $vmResourceGroup --location $location
+# Comment: Updated permission of imagedef
 on: [push]
 
 name: create_VM_Using_Shared_Image_Gallery
