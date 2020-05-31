@@ -35,7 +35,7 @@ jobs:
 
 
           az vm create \
-            --resource-group $vmResourceGroup \
+            --resource-group $sigResourceGroup \
             --name $vmName \
             --admin-username $adminUsername \
             --location $location \
