@@ -1,4 +1,4 @@
-# A sample workflow to create VM from shared image gallery!
+# A sample workflow to create VM from shared image gallery!!
 # az group create --name $vmResourceGroup --location $location
 on: [push]
 
