@@ -35,6 +35,6 @@ jobs:
           az vm create\
             --resource-group $vmResourceGroup \
             --name $vmName \
-            --image $imgDef \
+            --image "/subscriptions/afc11291-9826-46be-b852-70349146ddf8/resourceGroups/raiyan-rg2/providers/Microsoft.Compute/galleries/rai_sig_eastus/images/rai_ubunut_packer_def" \
             --admin-username $adminUsername \
             --admin-password $adminPassword
