@@ -1,6 +1,6 @@
 # A sample workflow to create VM from shared image gallery!!
 # az group create --name $vmResourceGroup --location $location
-# Comment: Updated permission of imagedef
+# Comment: imgDef="/subscriptions/afc11291-9826-46be-b852-70349146ddf8/resourceGroups/raiyan-rg2/providers/Microsoft.Compute/galleries/rai_sig_eastus/images/rai_ubunut_packer_def"
 on: [push]
 
 name: create_VM_Using_Shared_Image_Gallery
@@ -22,19 +22,24 @@ jobs:
         azcliversion: 2.0.72
         inlineScript: |
           az account show          
-          imgDef="/subscriptions/afc11291-9826-46be-b852-70349146ddf8/resourceGroups/raiyan-rg2/providers/Microsoft.Compute/galleries/rai_sig_eastus/images/rai_ubunut_packer_def"
           
-          vmResourceGroup=raiyan-rg2
+          
+          subscriptionID=afc11291-9826-46be-b852-70349146ddf8
+          sigResourceGroup=raiyan-rg2
+          sigName=rai_sig_eastus
+          imageDefName=rai_ubunut_packer_def
           location=eastus
           vmName=rai-vm-frm-sig
           adminUsername=moala
           adminPassword=${{ secrets.vm_pwd }}
 
 
+        az vm create \
+        --resource-group $vmResourceGroup \
+        --name $vmName \
+        --admin-username $adminUsername \
+        --location $location \
+        --image "/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/latest" \
+        --admin-password $adminPassword \
 
-          az vm create\
-            --resource-group $vmResourceGroup \
-            --name $vmName \
-            --image "/subscriptions/afc11291-9826-46be-b852-70349146ddf8/resourceGroups/raiyan-rg2/providers/Microsoft.Compute/galleries/rai_sig_eastus/images/rai_ubunut_packer_def" \
-            --admin-username $adminUsername \
-            --admin-password $adminPassword
+
