@@ -34,12 +34,12 @@ jobs:
           adminPassword=${{ secrets.vm_pwd }}
 
 
-        az vm create \
-        --resource-group $vmResourceGroup \
-        --name $vmName \
-        --admin-username $adminUsername \
-        --location $location \
-        --image "/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/latest" \
-        --admin-password $adminPassword \
+          az vm create \
+            --resource-group $vmResourceGroup \
+            --name $vmName \
+            --admin-username $adminUsername \
+            --location $location \
+            --image "/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/latest" \
+            --admin-password $adminPassword \
 
 
