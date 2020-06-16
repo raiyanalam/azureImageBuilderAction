@@ -1,4 +1,4 @@
-- name: Deploy Azure VM from Shared Image Gallery
+- name: Deploy Azure VMSS from Shared Image Gallery
     uses: azure/CLI@v1
     with:
       azcliversion: 2.0.72
