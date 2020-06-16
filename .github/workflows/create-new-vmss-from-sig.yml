@@ -1,18 +1,41 @@
-- name: Deploy Azure VMSS from Shared Image Gallery
-    uses: azure/CLI@v1
-    with:
-      azcliversion: 2.0.72
-      inlineScript: |
-        az account show         
-        subscriptionID=afc11291-9826-46be-b852-70349146ddf8          
-        sigResourceGroup=raiyan-rg2
-        sigName=rai_sig_eastus
-        imageDefName=rai_ubunut_packer_def
-        location=eastus
-        vmssName=rai-vmss-frm-sig
-        adminUsername=moala
-        adminPassword=${{ secrets.vm_pwd }}
-        az vmss create  --resource-group $sigResourceGroup --name $vmssName --instance-count 3 \
-            --image "/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/latest"  \
-            --admin-username $adminUsername  --location $location --admin-password $adminPassword
+on:
+  push:
+    paths: 
+      - '*/workflows/create-new-vmss-from-sig.yml'
+name: create_VMSS_Using_Shared_Image_Gallery
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Azure CLI script
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.0.72
+        inlineScript: |
+          az account show         
+          subscriptionID=afc11291-9826-46be-b852-70349146ddf8          
+          sigResourceGroup=raiyan-rg2
+          sigName=rai_sig_eastus
+          imageDefName=rai_ubunut_packer_def
+          location=eastus
+          vmssName=rai-vmss-frm-sig
+          adminUsername=moala
+          adminPassword=${{ secrets.vm_pwd }}
+          az vmss create  --resource-group $sigResourceGroup --name $vmssName --instance-count 3 \
+              --image "/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/latest"  \
+              --admin-username $adminUsername  --location $location --admin-password $adminPassword
+
+
+
+
+
+
 
