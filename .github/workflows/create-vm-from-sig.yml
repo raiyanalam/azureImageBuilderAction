@@ -1,7 +1,10 @@
 # A sample workflow to create VM from shared image gallery!!
 # az group create --name $vmResourceGroup --location $location
 # Comment: imgDef="/subscriptions/afc11291-9826-46be-b852-70349146ddf8/resourceGroups/raiyan-rg2/providers/Microsoft.Compute/galleries/rai_sig_eastus/images/rai_ubunut_packer_def"
-on: [push]
+on:
+  push:
+    paths: 
+      - '*/workflows/create-new-vm-from-sig.yml'
 
 name: create_VM_Using_Shared_Image_Gallery
 
@@ -32,8 +35,6 @@ jobs:
           vmName=rai-vm-frm-sig
           adminUsername=moala
           adminPassword=${{ secrets.vm_pwd }}
-
-
           az vm create \
             --resource-group $sigResourceGroup \
             --name $vmName \
@@ -41,5 +42,3 @@ jobs:
             --location $location \
             --image "/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/latest" \
             --admin-password $adminPassword \
-
-
