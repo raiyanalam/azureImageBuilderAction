@@ -21,7 +21,7 @@ jobs:
         azcliversion: 2.0.72
         inlineScript: |
           az account show         
-          subscriptionID=afc11291-9826-46be-b852-70349146ddf8          
+          subscriptionID=${{ secrets.AZURE_SUBSCRIPTION }}          
           sigResourceGroup=raiyan-rg2
           sigName=rai_sig_eastus
           imageDefName=rai_ubunut_packer_def
